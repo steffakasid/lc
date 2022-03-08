@@ -1,0 +1,44 @@
+= lc - Log Collector 4 AWS
+
+This tool is intended to collect logs from AWS LogInsights.
+
+== Usage
+
+`lc [flags]`
+
+=== Preqrequisites
+
+lc uses already provided credentials in ~/.aws/credentials also it uses the central configuration in ~/.aws/config!
+
+=== Examples
+
+  lc
+  lc -g '/aws/containerinsights/eks-prod/application' -d 1h
+  lc -g '/aws/containerinsights/eks-prod/application' -d 1h -p gw-eks-int
+  lc -g '/aws/containerinsights/eks-prod/application' -d 1h -p gw-eks-int -o
+  lc -g '/aws/containerinsights/eks-prod/application' -d 1h -p gw-eks-int -o -f 
+
+=== Flags
+-d, --duration string::           Duration(1w, 1d, 1h etc.) from today backwards of logs to get.
+-e, --end-time string::           The end time of logs to get. If not set we'll use today. Formt: 2006-01-02T15:04:05Z or 2006-01-02T15:04:05+07:00
+-f, --filter-pattern string::     The filter pattern to filter logs.
+-?, --help::                      Print usage information
+-l, --limit int32::               The maximum number of events to return. (default 10000)
+-g, --log-group string::          The log group name to get logs from.
+-n, --logstream-names strings::   Filters the results to only logs from the log streams in this list.
+-p, --logstream-prefix string::   Filters the results to include only events from log streams that have names starting with this prefix.
+-o, --output::                    Output logs to file
+-s, --start-time:: string         The start time of logs to get. Formt: 2006-01-02T15:04:05Z or 2006-01-02T15:04:05+07:00
+-v, --version::                   Print version information
+
+== Development
+
+=== Generate mock using mockery
+
+In order to test I used link:https://github.com/vektra/mockery[mockery] to create the mocks:
+
+[source,sh]
+----
+cd internal
+mockery --name <interface-name> --with-expecter
+----
