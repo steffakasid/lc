@@ -2,6 +2,14 @@
 
 This tool is intended to collect logs from AWS LogInsights.
 
+== Installation 
+
+`brew install steffakasid/lc/lc`
+
+Or `brew tap steffakasid/lc` and then `brew install lc`.
+
+`brew help`, `man brew` or check link:https://docs.brew.sh[Homebrew's documentation].
+
 == Usage
 
 `lc [flags]`
