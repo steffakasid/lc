@@ -111,7 +111,7 @@ func main() {
 			logResults, err := paginator.NextPage(context.TODO())
 			CheckError(err, false)
 			for _, event := range logResults.Events {
-				line := fmt.Sprintf("%s:%d - %s\n", *event.EventId, *event.Timestamp, *event.Message)
+				line := fmt.Sprintf("%s : %s - %s\n", *event.EventId, time.UnixMilli(*event.Timestamp).Format(time.RFC3339), *event.Message)
 				if viper.GetBool(output) {
 					_, err := file.WriteString(line)
 					CheckError(err, false)
