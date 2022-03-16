@@ -18,6 +18,8 @@ Or `brew tap steffakasid/lc` and then `brew install lc`.
 
 lc uses already provided credentials in ~/.aws/credentials also it uses the central configuration in ~/.aws/config!
 
+NOTE: You can find out more about configuration options (e.g. retries etc.) at link:https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html[cli configure files].
+
 === Examples
 
   lc
