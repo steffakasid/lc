@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
+	"github.com/aws/smithy-go"
 	logger "github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -34,6 +36,14 @@ var version = "0.1-dev"
 var outputFile string
 
 type ErrorMap map[string]error
+
+func (e ErrorMap) Error() string {
+	var errString string
+	for k, v := range e {
+		errString += fmt.Sprintf("%s:%s\n", k, v)
+	}
+	return errString
+}
 
 func init() {
 	flag.StringP(loggroup, "g", "", "The log group name to get logs from.")
@@ -109,30 +119,42 @@ func main() {
 
 		for paginator.HasMorePages() {
 			logResults, err := paginator.NextPage(context.TODO())
-			CheckError(err, false)
-			for _, event := range logResults.Events {
-				line := fmt.Sprintf("%s : %s - %s\n", *event.EventId, time.UnixMilli(*event.Timestamp).Format(time.RFC3339), *event.Message)
-				if viper.GetBool(output) {
-					_, err := file.WriteString(line)
-					CheckError(err, false)
-				} else {
-					fmt.Println(line)
+			if CheckError(err, false) && logResults != nil {
+				for _, event := range logResults.Events {
+					line := fmt.Sprintf("%s : %s - %s\n", *event.EventId, time.UnixMilli(*event.Timestamp).Format(time.RFC3339), *event.Message)
+					if viper.GetBool(output) {
+						_, err := file.WriteString(line)
+						CheckError(err, false)
+					} else {
+						fmt.Println(line)
+					}
 				}
 			}
 		}
 	}
 }
 
-func CheckError(err error, panic bool) {
-	if err != nil {
-		if panic {
-			logger.Fatal(err)
-		}
-		logger.Error(err)
+func CheckError(err error, panic bool) (wasError bool) {
+	wasError = false
+	var loggerFunc func(format string, args ...interface{})
+	if panic {
+		loggerFunc = logger.Fatalf
+	} else {
+		loggerFunc = logger.Errorf
 	}
+
+	if err != nil {
+		var ae smithy.APIError
+		wasError = true
+		if errors.As(err, &ae) {
+			loggerFunc("code: %s, message: %s, fault: %s", ae.ErrorCode(), ae.ErrorMessage(), ae.ErrorFault().String())
+		}
+		loggerFunc("%s\n", err)
+	}
+	return wasError
 }
 
-func validateFlags() ErrorMap {
+func validateFlags() error {
 	errs := ErrorMap{}
 
 	if viper.GetString(loggroup) == "" {
