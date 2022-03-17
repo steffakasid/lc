@@ -40,7 +40,7 @@ type ErrorMap map[string]error
 func (e ErrorMap) Error() string {
 	var errString string
 	for k, v := range e {
-		errString += fmt.Sprintf("%s:%s\n", k, v)
+		errString += fmt.Sprintf("%s:%s\n", k, v.Error())
 	}
 	return errString
 }
@@ -73,7 +73,8 @@ Usage:
 
 Preqrequisites:
   lc uses already provided credentials in ~/.aws/credentials also it uses the
-  central configuration in ~/.aws/config!
+  central configuration in ~/.aws/config! You can find out more about configuration
+  options (e.g. retries etc.) at https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html
 
 Examples:
   lc
@@ -90,7 +91,7 @@ Flags:`)
 
 	flag.Parse()
 	err := viper.BindPFlags(flag.CommandLine)
-	CheckError(err, true)
+	CheckError(err, logger.Fatalf)
 	logger.SetLevel(logger.DebugLevel)
 }
 
@@ -100,12 +101,13 @@ func main() {
 	} else if viper.GetBool("help") {
 		flag.Usage()
 	} else {
-		validateFlags()
+		err := validateFlags()
+		CheckError(err, logger.Fatalf)
 		filterLogEvents, err := parseFlags()
-		CheckError(err, true)
+		CheckError(err, logger.Fatalf)
 
 		cfg, err := config.LoadDefaultConfig(context.TODO())
-		CheckError(err, true)
+		CheckError(err, logger.Fatalf)
 		client := cloudwatchlogs.NewFromConfig(cfg)
 
 		paginator := cloudwatchlogs.NewFilterLogEventsPaginator(client, filterLogEvents)
@@ -113,18 +115,18 @@ func main() {
 		var file *os.File
 		if viper.GetBool(output) {
 			file, err = os.OpenFile(outputFile, os.O_APPEND|os.O_CREATE|os.O_RDWR, fs.FileMode(0644))
-			CheckError(err, true)
+			CheckError(err, logger.Fatalf)
 			defer file.Close()
 		}
 
 		for paginator.HasMorePages() {
 			logResults, err := paginator.NextPage(context.TODO())
-			if CheckError(err, false) && logResults != nil {
+			if CheckError(err, logger.Errorf) && logResults != nil {
 				for _, event := range logResults.Events {
 					line := fmt.Sprintf("%s : %s - %s\n", *event.EventId, time.UnixMilli(*event.Timestamp).Format(time.RFC3339), *event.Message)
 					if viper.GetBool(output) {
 						_, err := file.WriteString(line)
-						CheckError(err, false)
+						CheckError(err, logger.Errorf)
 					} else {
 						fmt.Println(line)
 					}
@@ -134,22 +136,17 @@ func main() {
 	}
 }
 
-func CheckError(err error, panic bool) (wasError bool) {
+func CheckError(err error, loggerFunc func(format string, args ...interface{})) (wasError bool) {
 	wasError = false
-	var loggerFunc func(format string, args ...interface{})
-	if panic {
-		loggerFunc = logger.Fatalf
-	} else {
-		loggerFunc = logger.Errorf
-	}
 
 	if err != nil {
 		var ae smithy.APIError
 		wasError = true
 		if errors.As(err, &ae) {
 			loggerFunc("code: %s, message: %s, fault: %s", ae.ErrorCode(), ae.ErrorMessage(), ae.ErrorFault().String())
+		} else {
+			loggerFunc("%s\n", err)
 		}
-		loggerFunc("%s\n", err)
 	}
 	return wasError
 }
@@ -163,7 +160,9 @@ func validateFlags() error {
 	if viper.GetString(starttime) != "" && viper.GetString(duration) != "" {
 		errs[duration] = fmt.Errorf("%s and %s must not provided together", starttime, duration)
 	}
-
+	if len(errs) == 0 {
+		return nil
+	}
 	return errs
 }
 
@@ -172,9 +171,8 @@ func parseFlags() (*cloudwatchlogs.FilterLogEventsInput, error) {
 	now := time.Now()
 
 	filterLogEvents := &cloudwatchlogs.FilterLogEventsInput{
-		LogGroupName:  aws.String(viper.GetString(loggroup)),
-		FilterPattern: aws.String(viper.GetString(filter)),
-		Limit:         aws.Int32(viper.GetInt32(limit)),
+		LogGroupName: aws.String(viper.GetString(loggroup)),
+		Limit:        aws.Int32(viper.GetInt32(limit)),
 	}
 
 	if viper.GetString(filter) != "" {
