@@ -14,11 +14,21 @@ Or `brew tap steffakasid/lc` and then `brew install lc`.
 
 `lc [flags]`
 
-=== Preqrequisites
+=== Preqrequisites and configuration
 
 lc uses already provided credentials in ~/.aws/credentials also it uses the central configuration in ~/.aws/config!
 
 NOTE: You can find out more about configuration options (e.g. retries etc.) at link:https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html[cli configure files].
+
+==== Configure retries
+
+If you need to change the retry behavior I use the following settings inside my `~/.aws/config` in my `[default]` section:
+
+[source, property]
+----
+retry_mode = adaptive
+max_attempts = 20
+----
 
 === Examples
 
