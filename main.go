@@ -16,6 +16,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"github.com/steffakasid/lc/internal"
 	"github.com/xhit/go-str2duration/v2"
 )
 
@@ -27,6 +28,7 @@ const (
 	filter          = "filter-pattern"
 	limit           = "limit"
 	output          = "output"
+	outputFormat    = "output-format"
 	logstreamprefix = "logstream-prefix"
 	logstreamnames  = "logstream-names"
 )
@@ -54,6 +56,7 @@ func init() {
 	flag.StringP(logstreamprefix, "p", "", "Filters the results to include only events from log streams that have names starting with this prefix.")
 	flag.StringSliceP(logstreamnames, "n", []string{}, "Filters the results to only logs from the log streams in this list.")
 	flag.BoolP(output, "o", false, "Output logs to file")
+	flag.StringP(outputFormat, "t", "txt", "The format of the output file [txt, yaml]")
 	flag.Int32P("limit", "l", 10000, "The maximum number of events to return.")
 	flag.BoolP("version", "v", false, "Print version information")
 	flag.BoolP("help", "?", false, "Print usage information")
@@ -123,12 +126,20 @@ func main() {
 			logResults, err := paginator.NextPage(context.TODO())
 			if !CheckError(err, logger.Errorf) && logResults != nil {
 				for _, event := range logResults.Events {
-					line := fmt.Sprintf("%s : %s - %s\n", *event.EventId, time.UnixMilli(*event.Timestamp).Format(time.RFC3339), *event.Message)
+					log := internal.Log(event)
 					if viper.GetBool(output) {
-						_, err := file.WriteString(line)
+						_, err := log.PrintTxtFile(file)
 						CheckError(err, logger.Errorf)
 					} else {
-						fmt.Println(line)
+						switch e := strings.ToLower(viper.GetString(outputFormat)); e {
+						case "txt", "text":
+							log.PrintOutTxt()
+						case "yml", "yaml":
+							err := log.PrintOutYml()
+							CheckError(err, logger.Errorf)
+						default:
+							logger.Fatalf("Unsupported output format %s", e)
+						}
 					}
 				}
 			}
@@ -160,6 +171,15 @@ func validateFlags() error {
 	if viper.GetString(starttime) != "" && viper.GetString(duration) != "" {
 		errs[duration] = fmt.Errorf("%s and %s must not provided together", starttime, duration)
 	}
+	if viper.GetString(outputFormat) != "" {
+		switch x := strings.ToLower(viper.GetString(outputFormat)); x {
+		case "txt", "text", "yaml", "yml":
+			break
+		default:
+			errs[outputFormat] = fmt.Errorf("%s given but expected [txt, yaml]", x)
+		}
+	}
+
 	if len(errs) == 0 {
 		return nil
 	}
