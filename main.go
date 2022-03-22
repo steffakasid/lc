@@ -121,7 +121,7 @@ func main() {
 
 		for paginator.HasMorePages() {
 			logResults, err := paginator.NextPage(context.TODO())
-			if CheckError(err, logger.Errorf) && logResults != nil {
+			if !CheckError(err, logger.Errorf) && logResults != nil {
 				for _, event := range logResults.Events {
 					line := fmt.Sprintf("%s : %s - %s\n", *event.EventId, time.UnixMilli(*event.Timestamp).Format(time.RFC3339), *event.Message)
 					if viper.GetBool(output) {
