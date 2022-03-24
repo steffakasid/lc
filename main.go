@@ -26,11 +26,14 @@ const (
 	endtime         = "end-time"
 	duration        = "duration"
 	filter          = "filter-pattern"
+	filterFields    = "filter-fields"
 	limit           = "limit"
 	output          = "output"
 	outputFormat    = "output-format"
 	logstreamprefix = "logstream-prefix"
 	logstreamnames  = "logstream-names"
+	versionFlag     = "version"
+	help            = "help"
 )
 
 var version = "0.1-dev"
@@ -53,13 +56,14 @@ func init() {
 	flag.StringP(endtime, "e", "", "The end time of logs to get. If not set we'll use today. Formt: 2006-01-02T15:04:05Z or 2006-01-02T15:04:05+07:00")
 	flag.StringP(duration, "d", "", "Duration(1w, 1d, 1h etc.) from today backwards of logs to get.")
 	flag.StringP(filter, "f", "", "The filter pattern to filter logs.")
+	flag.StringSliceP(filterFields, "i", []string{}, "Select fields from the logstream which should be printed.")
 	flag.StringP(logstreamprefix, "p", "", "Filters the results to include only events from log streams that have names starting with this prefix.")
 	flag.StringSliceP(logstreamnames, "n", []string{}, "Filters the results to only logs from the log streams in this list.")
 	flag.BoolP(output, "o", false, "Output logs to file")
 	flag.StringP(outputFormat, "t", "txt", "The format of the output file [txt, yaml]")
-	flag.Int32P("limit", "l", 10000, "The maximum number of events to return.")
-	flag.BoolP("version", "v", false, "Print version information")
-	flag.BoolP("help", "?", false, "Print usage information")
+	flag.Int32P(limit, "l", 10000, "The maximum number of events to return.")
+	flag.BoolP(versionFlag, "v", false, "Print version information")
+	flag.BoolP(help, "?", false, "Print usage information")
 
 	flag.Usage = func() {
 		w := os.Stderr
@@ -99,9 +103,9 @@ Flags:`)
 }
 
 func main() {
-	if viper.GetBool("version") {
+	if viper.GetBool(versionFlag) {
 		fmt.Printf("lc version: %s\n", version)
-	} else if viper.GetBool("help") {
+	} else if viper.GetBool(help) {
 		flag.Usage()
 	} else {
 		err := validateFlags()
@@ -128,17 +132,21 @@ func main() {
 				for _, event := range logResults.Events {
 					log := internal.Log(event)
 					if viper.GetBool(output) {
-						_, err := log.PrintTxtFile(file)
-						CheckError(err, logger.Errorf)
+						switch e := strings.ToLower(viper.GetString(outputFormat)); e {
+						case "txt", "text":
+							_, err := log.PrintTxtFile(file)
+							CheckError(err, logger.Errorf)
+						case "yml", "yaml":
+							_, err := log.PrintYamlFile(file, viper.GetStringSlice(filterFields)...)
+							CheckError(err, logger.Errorf)
+						}
 					} else {
 						switch e := strings.ToLower(viper.GetString(outputFormat)); e {
 						case "txt", "text":
 							log.PrintOutTxt()
 						case "yml", "yaml":
-							err := log.PrintOutYml()
+							err := log.PrintOutYml(viper.GetStringSlice(filterFields)...)
 							CheckError(err, logger.Errorf)
-						default:
-							logger.Fatalf("Unsupported output format %s", e)
 						}
 					}
 				}
