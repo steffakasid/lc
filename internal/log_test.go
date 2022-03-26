@@ -64,8 +64,8 @@ func TestPrintOutYaml(t *testing.T) {
 		logFromYaml := &YamlLog{}
 		err = yaml.Unmarshal(bt, logFromYaml)
 		assert.NoError(t, err)
-		assert.Equal(t, EVENTID, logFromYaml.EventId)
-		assert.Equal(t, LOGSTREAMNAME, logFromYaml.LogStreamName)
+		assert.Equal(t, EVENTID, *logFromYaml.EventId)
+		assert.Equal(t, LOGSTREAMNAME, *logFromYaml.LogStreamName)
 	})
 
 	t.Run("filter", func(t *testing.T) {
@@ -118,6 +118,26 @@ func TestPrintOutYaml(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Contains(t, logFromYaml.Message, "log")
 		assert.Contains(t, logFromYaml.Message["kubernetes"], "Pod_Name")
+	})
+
+	t.Run("filter metadata", func(t *testing.T) {
+		log := setupLog()
+		file, err := os.OpenFile(path.Join(t.TempDir(), "test.yml"), os.O_APPEND|os.O_CREATE|os.O_RDWR, fs.FileMode(0644))
+		assert.NoError(t, err)
+		written, err := log.PrintYamlFile(file, "metadata.timestamp")
+		assert.NoError(t, err)
+		assert.Greater(t, written, 0)
+		bt, err := os.ReadFile(file.Name())
+		t.Log(file.Name())
+		assert.NoError(t, err)
+		t.Log(string(bt))
+		logFromYaml := &YamlLog{}
+		err = yaml.Unmarshal(bt, logFromYaml)
+		assert.NoError(t, err)
+		assert.Nil(t, logFromYaml.EventId)
+		assert.Nil(t, logFromYaml.IngestionTime)
+		assert.Nil(t, logFromYaml.LogStreamName)
+		assert.WithinDuration(t, time.Now(), time.UnixMilli(*logFromYaml.Timestamp), 50*time.Millisecond)
 	})
 }
 

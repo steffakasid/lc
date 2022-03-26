@@ -3,19 +3,21 @@ package internal
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
 
 type Log types.FilteredLogEvent
 
 type YamlLog struct {
-	EventId       string `yaml:"event-id,omitempty"`
-	LogStreamName string `yaml:"log-stream-name,omitempty"`
-	IngestionTime int64  `yaml:"ingestion-time,omitempty"`
-	Timestamp     int64  `yaml:"timestamp,omitempty"`
+	EventId       *string `yaml:"event-id,omitempty"`
+	LogStreamName *string `yaml:"log-stream-name,omitempty"`
+	IngestionTime *int64  `yaml:"ingestion-time,omitempty"`
+	Timestamp     *int64  `yaml:"timestamp,omitempty"`
 	Message       map[string]interface{}
 }
 
@@ -54,10 +56,10 @@ func (l Log) FormatedLine() string {
 
 func (l Log) toYaml(filter ...string) ([]byte, error) {
 	yamlLog := &YamlLog{
-		EventId:       *l.EventId,
-		LogStreamName: *l.LogStreamName,
-		IngestionTime: *l.IngestionTime,
-		Timestamp:     *l.Timestamp,
+		EventId:       l.EventId,
+		LogStreamName: l.LogStreamName,
+		IngestionTime: l.IngestionTime,
+		Timestamp:     l.Timestamp,
 	}
 	str, err := json2yaml(*l.Message)
 	if err != nil {
@@ -69,6 +71,33 @@ func (l Log) toYaml(filter ...string) ([]byte, error) {
 	}
 
 	if len(filter) > 0 {
+		// search for metadata filter
+		metadataFilters := []string{}
+		for _, key := range filter {
+			if strings.Contains(key, "metadata.") {
+				metadataFilter := strings.SplitAfterN(key, ".", 2)
+				if len(metadataFilter) == 2 {
+					metadataFilters = append(metadataFilters, strings.ToLower(metadataFilter[1]))
+				} else {
+					logrus.Errorf("filter definition %s can't be applied", key)
+				}
+			}
+		}
+		if len(metadataFilters) > 0 {
+			if ok, _ := contains(metadataFilters, "timestamp"); !ok {
+				yamlLog.Timestamp = nil
+			}
+			if ok, _ := contains(metadataFilters, "ingestion-time"); !ok {
+				yamlLog.IngestionTime = nil
+			}
+			if ok, _ := contains(metadataFilters, "log-stream-name"); !ok {
+				yamlLog.LogStreamName = nil
+			}
+			if ok, _ := contains(metadataFilters, "event-id"); !ok {
+				yamlLog.EventId = nil
+			}
+		}
+
 		filterMap(yamlLog.Message, filter...)
 	}
 
@@ -93,5 +122,4 @@ func filterMap(m map[string]interface{}, filter ...string) {
 			delete(m, key)
 		}
 	}
-
 }
