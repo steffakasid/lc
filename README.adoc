@@ -36,7 +36,8 @@ max_attempts = 20
   lc -g '/aws/containerinsights/eks-prod/application' -d 1h
   lc -g '/aws/containerinsights/eks-prod/application' -d 1h -p gw-eks-int
   lc -g '/aws/containerinsights/eks-prod/application' -d 1h -p gw-eks-int -o
-  lc -g '/aws/containerinsights/eks-prod/application' -d 1h -p gw-eks-int -o -f 
+  lc -g '/aws/containerinsights/eks-prod/application' -d 1h -p gw-eks-int -o -f '{($.kubernetes.namespace_name=my-namespace) && ($.log=*multistep*)}'
+  lc -g '/aws/containerinsights/eks-test/application' -d 2s -t yaml -i log -i kubernetes.pod_name -i metadata.Timestamp
 
 === Flags
 -d, --duration string::           Duration(1w, 1d, 1h etc.) from today backwards of logs to get.

@@ -16,6 +16,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"github.com/steffakasid/lc/internal"
 	"github.com/xhit/go-str2duration/v2"
 )
 
@@ -25,10 +26,14 @@ const (
 	endtime         = "end-time"
 	duration        = "duration"
 	filter          = "filter-pattern"
+	filterFields    = "filter-fields"
 	limit           = "limit"
 	output          = "output"
+	outputFormat    = "output-format"
 	logstreamprefix = "logstream-prefix"
 	logstreamnames  = "logstream-names"
+	versionFlag     = "version"
+	help            = "help"
 )
 
 var version = "0.1-dev"
@@ -51,12 +56,14 @@ func init() {
 	flag.StringP(endtime, "e", "", "The end time of logs to get. If not set we'll use today. Formt: 2006-01-02T15:04:05Z or 2006-01-02T15:04:05+07:00")
 	flag.StringP(duration, "d", "", "Duration(1w, 1d, 1h etc.) from today backwards of logs to get.")
 	flag.StringP(filter, "f", "", "The filter pattern to filter logs.")
+	flag.StringSliceP(filterFields, "i", []string{}, "Select fields from the logstream which should be printed.")
 	flag.StringP(logstreamprefix, "p", "", "Filters the results to include only events from log streams that have names starting with this prefix.")
 	flag.StringSliceP(logstreamnames, "n", []string{}, "Filters the results to only logs from the log streams in this list.")
 	flag.BoolP(output, "o", false, "Output logs to file")
-	flag.Int32P("limit", "l", 10000, "The maximum number of events to return.")
-	flag.BoolP("version", "v", false, "Print version information")
-	flag.BoolP("help", "?", false, "Print usage information")
+	flag.StringP(outputFormat, "t", "txt", "The format of the output file [txt, yaml]")
+	flag.Int32P(limit, "l", 10000, "The maximum number of events to return.")
+	flag.BoolP(versionFlag, "v", false, "Print version information")
+	flag.BoolP(help, "?", false, "Print usage information")
 
 	flag.Usage = func() {
 		w := os.Stderr
@@ -96,9 +103,9 @@ Flags:`)
 }
 
 func main() {
-	if viper.GetBool("version") {
+	if viper.GetBool(versionFlag) {
 		fmt.Printf("lc version: %s\n", version)
-	} else if viper.GetBool("help") {
+	} else if viper.GetBool(help) {
 		flag.Usage()
 	} else {
 		err := validateFlags()
@@ -123,12 +130,24 @@ func main() {
 			logResults, err := paginator.NextPage(context.TODO())
 			if !CheckError(err, logger.Errorf) && logResults != nil {
 				for _, event := range logResults.Events {
-					line := fmt.Sprintf("%s : %s - %s\n", *event.EventId, time.UnixMilli(*event.Timestamp).Format(time.RFC3339), *event.Message)
+					log := internal.Log(event)
 					if viper.GetBool(output) {
-						_, err := file.WriteString(line)
-						CheckError(err, logger.Errorf)
+						switch e := strings.ToLower(viper.GetString(outputFormat)); e {
+						case "txt", "text":
+							_, err := log.PrintTxtFile(file)
+							CheckError(err, logger.Errorf)
+						case "yml", "yaml":
+							_, err := log.PrintYamlFile(file, viper.GetStringSlice(filterFields)...)
+							CheckError(err, logger.Errorf)
+						}
 					} else {
-						fmt.Println(line)
+						switch e := strings.ToLower(viper.GetString(outputFormat)); e {
+						case "txt", "text":
+							log.PrintOutTxt()
+						case "yml", "yaml":
+							err := log.PrintOutYml(viper.GetStringSlice(filterFields)...)
+							CheckError(err, logger.Errorf)
+						}
 					}
 				}
 			}
@@ -160,6 +179,15 @@ func validateFlags() error {
 	if viper.GetString(starttime) != "" && viper.GetString(duration) != "" {
 		errs[duration] = fmt.Errorf("%s and %s must not provided together", starttime, duration)
 	}
+	if viper.GetString(outputFormat) != "" {
+		switch x := strings.ToLower(viper.GetString(outputFormat)); x {
+		case "txt", "text", "yaml", "yml":
+			break
+		default:
+			errs[outputFormat] = fmt.Errorf("%s given but expected [txt, yaml]", x)
+		}
+	}
+
 	if len(errs) == 0 {
 		return nil
 	}
