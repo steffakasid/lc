@@ -50,7 +50,7 @@ func TestPrintOutYml(t *testing.T) {
 
 func TestPrintOutYaml(t *testing.T) {
 
-	t.Run("success", func(t *testing.T) {
+	t.Run("without filter", func(t *testing.T) {
 		log := setupLog()
 		file, err := os.OpenFile(path.Join(t.TempDir(), "test.yml"), os.O_APPEND|os.O_CREATE|os.O_RDWR, fs.FileMode(0644))
 		assert.NoError(t, err)
@@ -68,7 +68,7 @@ func TestPrintOutYaml(t *testing.T) {
 		assert.Equal(t, LOGSTREAMNAME, *logFromYaml.LogStreamName)
 	})
 
-	t.Run("filter", func(t *testing.T) {
+	t.Run("simple filter", func(t *testing.T) {
 		log := setupLog()
 		file, err := os.OpenFile(path.Join(t.TempDir(), "test.yml"), os.O_APPEND|os.O_CREATE|os.O_RDWR, fs.FileMode(0644))
 		assert.NoError(t, err)
@@ -83,26 +83,13 @@ func TestPrintOutYaml(t *testing.T) {
 		err = yaml.Unmarshal(bt, logFromYaml)
 		assert.NoError(t, err)
 		assert.Contains(t, logFromYaml.Message, "log")
+		assert.Nil(t, logFromYaml.EventId)
+		assert.Nil(t, logFromYaml.IngestionTime)
+		assert.Nil(t, logFromYaml.LogStreamName)
+		assert.Nil(t, logFromYaml.Timestamp)
 	})
 
-	t.Run("filter", func(t *testing.T) {
-		log := setupLog()
-		file, err := os.OpenFile(path.Join(t.TempDir(), "test.yml"), os.O_APPEND|os.O_CREATE|os.O_RDWR, fs.FileMode(0644))
-		assert.NoError(t, err)
-		written, err := log.PrintYamlFile(file, "log")
-		assert.NoError(t, err)
-		assert.Greater(t, written, 0)
-		bt, err := os.ReadFile(file.Name())
-		t.Log(file.Name())
-		assert.NoError(t, err)
-		t.Log(string(bt))
-		logFromYaml := &YamlLog{}
-		err = yaml.Unmarshal(bt, logFromYaml)
-		assert.NoError(t, err)
-		assert.Contains(t, logFromYaml.Message, "log")
-	})
-
-	t.Run("filter", func(t *testing.T) {
+	t.Run("complex filter", func(t *testing.T) {
 		log := setupLog()
 		file, err := os.OpenFile(path.Join(t.TempDir(), "test.yml"), os.O_APPEND|os.O_CREATE|os.O_RDWR, fs.FileMode(0644))
 		assert.NoError(t, err)

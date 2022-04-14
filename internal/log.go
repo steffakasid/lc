@@ -83,19 +83,17 @@ func (l Log) toYaml(filter ...string) ([]byte, error) {
 				}
 			}
 		}
-		if len(metadataFilters) > 0 {
-			if ok, _ := contains(metadataFilters, "timestamp"); !ok {
-				yamlLog.Timestamp = nil
-			}
-			if ok, _ := contains(metadataFilters, "ingestion-time"); !ok {
-				yamlLog.IngestionTime = nil
-			}
-			if ok, _ := contains(metadataFilters, "log-stream-name"); !ok {
-				yamlLog.LogStreamName = nil
-			}
-			if ok, _ := contains(metadataFilters, "event-id"); !ok {
-				yamlLog.EventId = nil
-			}
+		if ok, _ := contains(metadataFilters, "timestamp"); !ok {
+			yamlLog.Timestamp = nil
+		}
+		if ok, _ := contains(metadataFilters, "ingestion-time"); !ok {
+			yamlLog.IngestionTime = nil
+		}
+		if ok, _ := contains(metadataFilters, "log-stream-name"); !ok {
+			yamlLog.LogStreamName = nil
+		}
+		if ok, _ := contains(metadataFilters, "event-id"); !ok {
+			yamlLog.EventId = nil
 		}
 
 		filterMap(yamlLog.Message, filter...)
