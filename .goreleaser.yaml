@@ -49,6 +49,6 @@ brews:
     # Default is the root folder.
     folder: Formula
 
-    homepage: "https://github.com/steffakasid/trivy-project-scanner"
+    homepage: "https://github.com/steffakasid/lc"
     description: "This tool can be used collect from AWS cloudwatch log groups"
     license: "Apache-2.0"
