@@ -56,7 +56,7 @@ func init() {
 	flag.StringP(endtime, "e", "", "The end time of logs to get. If not set we'll use today. Formt: 2006-01-02T15:04:05Z or 2006-01-02T15:04:05+07:00")
 	flag.StringP(duration, "d", "", "Duration(1w, 1d, 1h etc.) from today backwards of logs to get.")
 	flag.StringP(filter, "f", "", "The filter pattern to filter logs.")
-	flag.StringSliceP(filterFields, "i", []string{}, "Select fields from the logstream which should be printed.")
+	flag.StringSliceP(filterFields, "i", []string{}, "Select fields from the logstream which should be printed. Only works with logformat: yaml.")
 	flag.StringP(logstreamprefix, "p", "", "Filters the results to include only events from log streams that have names starting with this prefix.")
 	flag.StringSliceP(logstreamnames, "n", []string{}, "Filters the results to only logs from the log streams in this list.")
 	flag.BoolP(output, "o", false, "Output logs to file")
@@ -89,7 +89,8 @@ Examples:
   lc -g '/aws/containerinsights/eks-prod/application' -d 1h -p gw-eks-int
   lc -g '/aws/containerinsights/eks-prod/application' -d 1h -p gw-eks-int -o
   lc -g '/aws/containerinsights/eks-prod/application' -d 1h -p gw-eks-int -o -f 
-  lc -g '/aws/containerinsights/eks-prod/application' -d 1h -p gw-eks-int -o -f '{($.kubernetes.namespace_name=ibm-api-connect-gw-int) && ($.log=*multistep*)}'
+  lc -g '/aws/containerinsights/eks-prod/application' -d 1h -p gw-eks-int -o -f '{($.kubernetes.namespace_name=ibm-api-connect-gw-int) && ($.log=*multistep*)}
+  lc -g '/aws/containerinsights/eks-test/application' -d 1h -p gw-eks-int -t yaml -i log -i kubernetes.pod_name -i metadata.Timestamp'
 
 Flags:`)
 
