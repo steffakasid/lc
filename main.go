@@ -54,7 +54,7 @@ func init() {
 	flag.StringP(loggroup, "g", "", "The log group name to get logs from.")
 	flag.StringP(starttime, "s", "", "The start time of logs to get. Formt: 2006-01-02T15:04:05Z or 2006-01-02T15:04:05+07:00")
 	flag.StringP(endtime, "e", "", "The end time of logs to get. If not set we'll use today. Formt: 2006-01-02T15:04:05Z or 2006-01-02T15:04:05+07:00")
-	flag.StringP(duration, "d", "", "Duration(1w, 1d, 1h etc.) from today backwards of logs to get.")
+	flag.StringP(duration, "d", "", "Duration(1w, 1d, 1h etc.) from today backwards of logs to get. If provided together with start-time, the duration will be added to the start-time to calculate the end-time.")
 	flag.StringP(filter, "f", "", "The filter pattern to filter logs.")
 	flag.StringSliceP(filterFields, "i", []string{}, "Select fields from the logstream which should be printed. Only works with logformat: yaml.")
 	flag.StringP(logstreamprefix, "p", "", "Filters the results to include only events from log streams that have names starting with this prefix.")
@@ -177,8 +177,8 @@ func validateFlags() error {
 	if viper.GetString(loggroup) == "" {
 		errs[loggroup] = fmt.Errorf("%s is a required flag", loggroup)
 	}
-	if viper.GetString(starttime) != "" && viper.GetString(duration) != "" {
-		errs[duration] = fmt.Errorf("%s and %s must not provided together", starttime, duration)
+	if viper.GetString(endtime) != "" && viper.GetString(duration) != "" {
+		errs[duration] = fmt.Errorf("%s and %s must not provided together", endtime, duration)
 	}
 	if viper.GetString(outputFormat) != "" {
 		switch x := strings.ToLower(viper.GetString(outputFormat)); x {
@@ -197,7 +197,9 @@ func validateFlags() error {
 
 func parseFlags() (*cloudwatchlogs.FilterLogEventsInput, error) {
 
-	now := time.Now()
+	var startTime, endTime time.Time
+	var dur time.Duration
+	var err error
 
 	filterLogEvents := &cloudwatchlogs.FilterLogEventsInput{
 		LogGroupName: aws.String(viper.GetString(loggroup)),
@@ -217,30 +219,40 @@ func parseFlags() (*cloudwatchlogs.FilterLogEventsInput, error) {
 	}
 
 	if viper.GetString(duration) != "" {
-		dur, err := str2duration.ParseDuration(viper.GetString(duration))
+		dur, err = str2duration.ParseDuration(viper.GetString(duration))
 		if err != nil {
 			return nil, err
 		}
-		start := now.Add(dur * -1)
-		logger.Debugf("Duration is set. Result date %s", start.Format(time.RFC3339))
-		filterLogEvents.StartTime = aws.Int64(start.UnixMilli())
 	}
 
 	if viper.GetString(starttime) != "" {
-		start, err := time.Parse(time.RFC3339, viper.GetString(starttime))
+		startTime, err = time.Parse(time.RFC3339, viper.GetString(starttime))
 		if err != nil {
 			return nil, err
 		}
-		filterLogEvents.StartTime = aws.Int64(start.UnixMilli())
 	}
 
 	if viper.GetString(endtime) != "" {
-		end, err := time.Parse(time.RFC3339, viper.GetString(endtime))
+		endTime, err = time.Parse(time.RFC3339, viper.GetString(endtime))
 		if err != nil {
 			return nil, err
 		}
-		filterLogEvents.EndTime = aws.Int64(end.UnixMilli())
 	}
+
+	zeroTime := time.Time{}
+	if !startTime.Equal(zeroTime) {
+		if dur != 0 {
+			endTime = startTime.Add(dur)
+		}
+	} else {
+		startTime = time.Now().Add(dur * -1)
+	}
+	filterLogEvents.StartTime = aws.Int64(startTime.UnixMilli())
+
+	if &endTime != nil {
+		filterLogEvents.EndTime = aws.Int64(endTime.UnixMilli())
+	}
+
 	outputFile = fmt.Sprintf("logs%s-%d.txt", strings.ReplaceAll(viper.GetString(loggroup), "/", "-"), time.Now().Unix())
 
 	return filterLogEvents, nil

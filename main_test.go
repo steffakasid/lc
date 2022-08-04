@@ -61,22 +61,27 @@ func TestValidateFlags(t *testing.T) {
 		assert.EqualError(t, err, fmt.Sprintf("log-group:%s is a required flag\n", loggroup))
 		viper.Reset()
 	})
-	t.Run("Starttime and duration at the same time", func(t *testing.T) {
+	t.Run("Endtime and duration at the same time", func(t *testing.T) {
 		viper.Set(loggroup, "testgroup")
-		viper.Set(starttime, "12345")
+		viper.Set(endtime, "12345")
 		viper.Set(duration, "1d")
 		err := validateFlags()
 		assert.Error(t, err)
-		assert.EqualError(t, err, fmt.Sprintf("duration:%s and %s must not provided together\n", starttime, duration))
+		assert.EqualError(t, err, fmt.Sprintf("duration:%s and %s must not provided together\n", endtime, duration))
 		viper.Reset()
 	})
 	t.Cleanup(viper.Reset)
 }
 
 func TestParseFlags(t *testing.T) {
-	viper.SetDefault(loggroup, "unittest")
-	viper.SetDefault(limit, 10000)
+	flagDefaults := func() {
+		viper.SetDefault(loggroup, "unittest")
+		viper.SetDefault(limit, 10000)
+	}
+	flagDefaults()
+
 	t.Run("Nothing else set", func(t *testing.T) {
+		t.Cleanup(flagDefaults)
 		filterLogsInput, err := parseFlags()
 		assert.NoError(t, err)
 		assert.Equal(t, "unittest", *filterLogsInput.LogGroupName)
@@ -84,6 +89,7 @@ func TestParseFlags(t *testing.T) {
 		viper.Reset()
 	})
 	t.Run("With filter", func(t *testing.T) {
+		t.Cleanup(flagDefaults)
 		viper.Set(filter, "xyz")
 		filterLogsInput, err := parseFlags()
 		assert.NoError(t, err)
@@ -91,6 +97,7 @@ func TestParseFlags(t *testing.T) {
 		viper.Reset()
 	})
 	t.Run("With logstreamnames", func(t *testing.T) {
+		t.Cleanup(flagDefaults)
 		viper.Set(logstreamnames, []string{"something"})
 		filterLogsInput, err := parseFlags()
 		assert.NoError(t, err)
@@ -98,6 +105,7 @@ func TestParseFlags(t *testing.T) {
 		viper.Reset()
 	})
 	t.Run("With logstreamprefix", func(t *testing.T) {
+		t.Cleanup(flagDefaults)
 		viper.Set(logstreamprefix, "abc")
 		filterLogsInput, err := parseFlags()
 		assert.NoError(t, err)
@@ -105,6 +113,7 @@ func TestParseFlags(t *testing.T) {
 		viper.Reset()
 	})
 	t.Run("With duration", func(t *testing.T) {
+		t.Cleanup(flagDefaults)
 		viper.Set(duration, "1d")
 		filterLogsInput, err := parseFlags()
 		assert.NoError(t, err)
@@ -115,6 +124,7 @@ func TestParseFlags(t *testing.T) {
 		viper.Reset()
 	})
 	t.Run("With startdate", func(t *testing.T) {
+		t.Cleanup(flagDefaults)
 		viper.Set(starttime, "2022-01-02T15:04:05Z")
 		filterLogsInput, err := parseFlags()
 		assert.NoError(t, err)
@@ -123,7 +133,25 @@ func TestParseFlags(t *testing.T) {
 		assert.Equal(t, expectedStart.UnixMilli(), *filterLogsInput.StartTime)
 		viper.Reset()
 	})
+	t.Run("With startdate and duration", func(t *testing.T) {
+		t.Cleanup(flagDefaults)
+
+		viper.Set(starttime, "2022-01-02T15:04:05Z")
+		viper.Set(duration, "1d")
+
+		duration, _ := str2duration.ParseDuration(viper.GetString(duration))
+		expectedStart, _ := time.Parse(time.RFC3339, viper.GetString(starttime))
+		expectedEnd := expectedStart.Add(duration)
+
+		filterLogsInput, err := parseFlags()
+		assert.NoError(t, err)
+		assert.NoError(t, err)
+		assert.Equal(t, expectedStart.UnixMilli(), *filterLogsInput.StartTime)
+		assert.WithinDuration(t, expectedEnd, time.UnixMilli(*filterLogsInput.EndTime), 5*time.Millisecond)
+		viper.Reset()
+	})
 	t.Run("With enddate", func(t *testing.T) {
+		t.Cleanup(flagDefaults)
 		viper.Set(endtime, "2022-01-02T15:04:05Z")
 		filterLogsInput, err := parseFlags()
 		assert.NoError(t, err)
