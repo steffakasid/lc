@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/aws/aws-sdk-go-v2 v1.17.1
 	github.com/aws/aws-sdk-go-v2/config v1.17.10
-	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.16.0
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.16.1
 	github.com/aws/smithy-go v1.13.4
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/pflag v1.0.5
