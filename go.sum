@@ -556,6 +556,8 @@ github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.20.10 h1:3OAeRqUboCVhc3co
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.20.10/go.mod h1:5k59EsYR4orIPOQrGAKtQjIsM4Yw9qfxMeSs6+/UVN0=
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.20.11 h1:v50ZdTUw4Ak1Y58bnUt5Dw1k38bdU0ixZ8QGpRq3Shg=
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.20.11/go.mod h1:5k59EsYR4orIPOQrGAKtQjIsM4Yw9qfxMeSs6+/UVN0=
+github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.21.0 h1:XSDT81zGBjXjREGWkMXX5p6nBd5/wQGZ/OuxTriJ2sE=
+github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.21.0/go.mod h1:5k59EsYR4orIPOQrGAKtQjIsM4Yw9qfxMeSs6+/UVN0=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.0 h1:YQ3fTXACo7xeAqg0NiqcCmBOXJruUfh+4+O2qxF2EjQ=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.0/go.mod h1:R31ot6BgESRCIoxwfKtIHzZMo/vsZn2un81g9BJ4nmo=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.5 h1:gRW1ZisKc93EWEORNJRvy/ZydF3o6xLSveJHdi1Oa0U=
