@@ -201,6 +201,8 @@ func parseFlags() (*cloudwatchlogs.FilterLogEventsInput, error) {
 	var dur time.Duration
 	var err error
 
+	endTime = time.Now()
+
 	filterLogEvents := &cloudwatchlogs.FilterLogEventsInput{
 		LogGroupName: aws.String(viper.GetString(loggroup)),
 		Limit:        aws.Int32(viper.GetInt32(limit)),
@@ -249,9 +251,7 @@ func parseFlags() (*cloudwatchlogs.FilterLogEventsInput, error) {
 	}
 	filterLogEvents.StartTime = aws.Int64(startTime.UnixMilli())
 
-	if &endTime != nil {
-		filterLogEvents.EndTime = aws.Int64(endTime.UnixMilli())
-	}
+	filterLogEvents.EndTime = aws.Int64(endTime.UnixMilli())
 
 	outputFile = fmt.Sprintf("logs%s-%d.txt", strings.ReplaceAll(viper.GetString(loggroup), "/", "-"), time.Now().Unix())
 
