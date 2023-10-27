@@ -119,6 +119,8 @@ func TestParseFlags(t *testing.T) {
 		assert.NoError(t, err)
 		expectedDuration, err := str2duration.ParseDuration("1d")
 		assert.NoError(t, err)
+		// verify that EndTime is greater then 0 as othwise this will result in an API error.
+		assert.Greater(t, *filterLogsInput.EndTime, int64(0))
 		// Millisecond precision is sometimes to hard so we except a derivation of 5ms
 		assert.WithinDuration(t, time.Now().Add(expectedDuration*-1), time.UnixMilli(*filterLogsInput.StartTime), 5*time.Millisecond)
 		viper.Reset()
