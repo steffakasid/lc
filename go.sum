@@ -62,6 +62,8 @@ github.com/aws/aws-sdk-go-v2/config v1.22.3 h1:JewoyAW8yPRpWus3gy/rIGhorHN4zInB8
 github.com/aws/aws-sdk-go-v2/config v1.22.3/go.mod h1:/kLz7rok3cKoM3dcQuNr86T4rXnC6HYIMWMx8vFUXig=
 github.com/aws/aws-sdk-go-v2/config v1.23.0 h1:kqzEfGGDIrRJpfJckgwuZfFTbU9NB1jZnRcaO9MpOqE=
 github.com/aws/aws-sdk-go-v2/config v1.23.0/go.mod h1:p7wbxKXXjS1GGQOss7VXOazVMFF9bjUGq85/4wR/fSw=
+github.com/aws/aws-sdk-go-v2/config v1.24.0 h1:4LEk29JO3w+y9dEo/5Tq5QTP7uIEw+KQrKiHOs4xlu4=
+github.com/aws/aws-sdk-go-v2/config v1.24.0/go.mod h1:11nNDAuK86kOUHeuEQo8f3CkcV5xuUxvPwFjTZE/PnQ=
 github.com/aws/aws-sdk-go-v2/credentials v1.13.43 h1:LU8vo40zBlo3R7bAvBVy/ku4nxGEyZe9N8MqAeFTzF8=
 github.com/aws/aws-sdk-go-v2/credentials v1.13.43/go.mod h1:zWJBz1Yf1ZtX5NGax9ZdNjhhI4rgjfgsyk6vTY1yfVg=
 github.com/aws/aws-sdk-go-v2/credentials v1.14.0 h1:LQquqPE7cL55RQmA/UBoBKehDlEtMnQKm3B0Q672ePE=
@@ -110,6 +112,8 @@ github.com/aws/aws-sdk-go-v2/internal/ini v1.5.2 h1:5KL4rS1yq5rJ6Q8lrlsFPHCPWwhk
 github.com/aws/aws-sdk-go-v2/internal/ini v1.5.2/go.mod h1:rdAuXeHWhI/zkpYcO5n8WCpaIgY9MUxFyBsuqq3kjyA=
 github.com/aws/aws-sdk-go-v2/internal/ini v1.6.0 h1:hwZB07/beLiCopuRKF0t+dEHmP39iN4YtDh3X5d3hrg=
 github.com/aws/aws-sdk-go-v2/internal/ini v1.6.0/go.mod h1:rdAuXeHWhI/zkpYcO5n8WCpaIgY9MUxFyBsuqq3kjyA=
+github.com/aws/aws-sdk-go-v2/internal/ini v1.7.0 h1:usgqiJtamuGIBj+OvYmMq89+Z1hIKkMJToz1WpoeNUY=
+github.com/aws/aws-sdk-go-v2/internal/ini v1.7.0/go.mod h1:6fQQgfuGmw8Al/3M2IgIllycxV7ZW7WCdVSqfBeUiCY=
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.24.2 h1:g2t+hNCOYWICWs0cQLXk86DnXQMXgx1omrAGEpF/d68=
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.24.2/go.mod h1:5ngOUsc/7/voqXQ5Mn5T5l9/rWopTMgu7hk+4Fl2AS4=
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.25.0 h1:NxVlXbd2XJb+WGlINWgHjZHLhWllqQwemi0oGAaiOTM=
