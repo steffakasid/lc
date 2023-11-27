@@ -168,6 +168,8 @@ github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.27.1 h1:TNRPtVMfBVk24DL3o
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.27.1/go.mod h1:f+2AxSfO44KOyp+hsuDsjJyZmaOQxkcmGKRFExyHZdU=
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.27.2 h1:zl57IYAWKaRzQiy2WzOeBt/ckXlGlvD9S2cjJh43uAo=
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.27.2/go.mod h1:NRP65i31tm0UhGwc9j6TGwk7dMs1ZDprZPIHfr+gHCU=
+github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.28.0 h1:7XDP8uP3hsQboGcZ7f6tNAdYIKWRCjmeLx1sRKJo+jY=
+github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.28.0/go.mod h1:NRP65i31tm0UhGwc9j6TGwk7dMs1ZDprZPIHfr+gHCU=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.10.1 h1:rpkF4n0CyFcrJUG/rNNohoTmhtWlFTRI4BsZOh9PvLs=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.10.1/go.mod h1:l9ymW25HOqymeU2m1gbUQ3rUIsTwKs8gYHXkqDQUhiI=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.37 h1:WWZA/I2K4ptBS1kg0kV1JbBtG/umed0vwHRrmcr9z7k=
