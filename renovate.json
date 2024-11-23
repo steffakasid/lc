@@ -25,12 +25,13 @@
     {
       "customType": "regex",
       "fileMatch": [
-        "^.github\/workflows\/.*.yml$"
+        "^.github\/workflows\/.*\\.yml$"
       ],
       "matchStrings": [
-        "\\s(?<depName>go)-version: (?<currentValue>.*?)\n/gm"
+        "(?<depName>go)-version: (?<currentValue>.*?)\\s"
       ],
-      "datasourceTemplate": "go"
+      "depNameTemplate": "go",
+      "datasourceTemplate": "golang-version"
     }
   ]
 }
