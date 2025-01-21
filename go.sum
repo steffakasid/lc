@@ -698,6 +698,8 @@ github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.45.5 h1:slYEzDnAoEsSIX7XN
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.45.5/go.mod h1:zZeYjS1D+qvIOiDrCT89Rrm6vSn4m8DNhi0kb3wwzYM=
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.45.6 h1:2oLCi90fh8JYysC+7mk7g6Zlg/lDvB5wNMC2mGbrhiA=
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.45.6/go.mod h1:zZeYjS1D+qvIOiDrCT89Rrm6vSn4m8DNhi0kb3wwzYM=
+github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.45.7 h1:DddWiL/XVT9GjMZqbYoIpJm5fFa08/CSk7fPN5neWVY=
+github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.45.7/go.mod h1:zZeYjS1D+qvIOiDrCT89Rrm6vSn4m8DNhi0kb3wwzYM=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.10.1 h1:rpkF4n0CyFcrJUG/rNNohoTmhtWlFTRI4BsZOh9PvLs=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.10.1/go.mod h1:l9ymW25HOqymeU2m1gbUQ3rUIsTwKs8gYHXkqDQUhiI=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.10.2 h1:/3LHJKFV+VEIEIZi2I3q4K2wgQwNwAW2t0SXnCCEg28=
@@ -1092,6 +1094,8 @@ github.com/aws/smithy-go v1.21.0 h1:H7L8dtDRk0P1Qm6y0ji7MCYMQObJ5R9CRpyPhRUkLYA=
 github.com/aws/smithy-go v1.21.0/go.mod h1:irrKGvNn1InZwb2d7fkIRNucdfwR8R+Ts3wxYa/cJHg=
 github.com/aws/smithy-go v1.22.1 h1:/HPHZQ0g7f4eUeK6HKglFz8uwVfZKgoI25rb/J+dnro=
 github.com/aws/smithy-go v1.22.1/go.mod h1:irrKGvNn1InZwb2d7fkIRNucdfwR8R+Ts3wxYa/cJHg=
+github.com/aws/smithy-go v1.22.2 h1:6D9hW43xKFrRx/tXXfAlIZc4JI+yQe6snnWcQyxSyLQ=
+github.com/aws/smithy-go v1.22.2/go.mod h1:irrKGvNn1InZwb2d7fkIRNucdfwR8R+Ts3wxYa/cJHg=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
 github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=
