@@ -1,6 +1,6 @@
 module github.com/steffakasid/lc
 
-go 1.21
+go 1.22
 
 toolchain go1.24.0
 
@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.36.1
 	github.com/aws/aws-sdk-go-v2/config v1.29.6
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.45.13
-	github.com/aws/smithy-go v1.22.2
+	github.com/aws/smithy-go v1.22.3
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/pflag v1.0.6
 	github.com/spf13/viper v1.19.0
