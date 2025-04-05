@@ -11,14 +11,16 @@
         "digest"
       ],
       "automerge": true,
-      "groupName": "Dependencies (non-major)"
+      "groupName": "Dependencies (non-major)",
+      "groupSlug": "non-major"
     },
     {
       "matchUpdateTypes": [
         "major"
       ],
       "automerge": true,
-      "groupName": "Dependencies (major)"
+      "groupName": "Dependencies (major)",
+      "groupSlug": "major"
     }
   ],
   "customManagers": [
