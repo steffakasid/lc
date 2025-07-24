@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.36.6
 	github.com/aws/aws-sdk-go-v2/config v1.29.18
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.53.1
-	github.com/aws/smithy-go v1.22.4
+	github.com/aws/smithy-go v1.22.5
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/pflag v1.0.7
 	github.com/spf13/viper v1.20.1
