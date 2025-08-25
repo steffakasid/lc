@@ -7,7 +7,7 @@ toolchain go1.25.0
 require (
 	github.com/aws/aws-sdk-go-v2 v1.38.1
 	github.com/aws/aws-sdk-go-v2/config v1.31.2
-	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.56.2
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.57.0
 	github.com/aws/smithy-go v1.22.5
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/pflag v1.0.7
